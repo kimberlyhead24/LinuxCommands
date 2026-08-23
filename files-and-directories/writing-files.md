@@ -191,3 +191,19 @@ Before writing a file:
 ## Course Source
 
 - [Coursera: Writing Files](https://www.coursera.org/learn/python-operating-system/lecture/fC3e9/writing-files)
+
+- ## File Modes
+
+| Mode | Meaning | Creates file? | Replaces existing content? |
+|---|---|---:|---:|
+| `"r"` | Read text; default mode | No | No |
+| `"rt"` | Read text explicitly | No | No |
+| `"w"` | Write text | Yes | Yes |
+| `"wt"` | Write text explicitly | Yes | Yes |
+| `"a"` | Append text | Yes | No |
+| `"x"` | Create a new text file only | Yes | Fails if file exists |
+| `"r+"` | Read and write; file must already exist | No | Depends on writes |
+| `"w+"` | Write and read; replaces existing content | Yes | Yes |
+| `"a+"` | Append and read | Yes | No |
+| `"rb"` | Read binary data | No | No |
+| `"wb"` | Write binary data | Yes | Yes |
