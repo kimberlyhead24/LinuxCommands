@@ -1,0 +1,103 @@
+# Pitfalls of Automation
+
+## Core Idea
+
+Automation can save time and reduce manual work, but it can also multiply mistakes if the process is incorrect.
+
+A bad manual process causes one mistake at a time. A bad automated process can repeat the same mistake across many files, records, or systems very quickly.
+
+## Common Pitfalls
+
+| Pitfall | Why it is dangerous |
+|---|---|
+| Automating a broken process | The script repeats bad logic faster |
+| No testing | Errors may not appear until after real data is changed |
+| No backups | Deleted or overwritten files may be hard to recover |
+| Wrong assumptions | The script may fail or behave badly when filenames, formats, or inputs change |
+| No error handling | One failure can stop the script or leave partial changes |
+| No logging | It becomes difficult to know what the script changed |
+| Overwriting data | Existing files or records may be replaced accidentally |
+| No human review | Sensitive or high-impact actions may need approval before execution |
+
+## Examples of Automation Problems
+
+### File management
+
+A script meant to rename `.txt` files could rename the wrong files if the matching pattern is too broad.
+
+### Data cleanup
+
+A script meant to standardize dates could corrupt records if different date formats appear in the same dataset.
+
+### Deletion
+
+A cleanup script could delete important files if the target folder or filter is incorrect.
+
+### Email or messaging
+
+An automated message script could send the wrong content to the wrong people if the source data is inaccurate.
+
+## Why Automation Fails
+
+Automation often fails because of one or more of these problems:
+
+- The task was not fully understood first
+- The script was not tested on sample data
+- Edge cases were ignored
+- The script trusted input too much
+- The process changed, but the script did not
+- The script had permission to make irreversible changes
+
+## Safety Practices
+
+Before automating a task:
+
+- Understand the manual process first
+- Test on a small sample before full use
+- Keep backups of important data
+- Add checks before deleting or overwriting anything
+- Log actions and errors
+- Use clear filenames, folder paths, and filters
+- Review the results after each run
+- Add a dry-run mode when possible
+
+## Dry-Run Idea
+
+A dry run shows what the script **would** do without actually changing files.
+
+Example:
+
+```py
+dry_run = True
+
+for filename in files:
+    new_name = filename.lower()
+    if dry_run:
+        print(f"Would rename {filename} -> {new_name}")
+    else:
+        print(f"Renaming {filename} -> {new_name}")
+        # perform rename here
+```
+
+Dry-run mode is one of the safest ways to test file automation before touching real data.
+
+## Good Questions to Ask
+
+Before running an automation script, ask:
+
+- What exactly will this change?
+- What happens if the input is incomplete or malformed?
+- Can the changes be reversed?
+- Is there a backup?
+- Can this be tested safely first?
+- Does this task need human review?
+
+## What to Remember
+
+- Automation can multiply errors as easily as it multiplies efficiency.
+- Never automate a process that is not already understood.
+- Test first, especially before changing, moving, or deleting files.
+- Use backups, logs, and dry runs to reduce risk.
+- High-impact or sensitive tasks should still include human oversight.
+
+<!-- Improvement idea: Add a real "safe file renamer" example later with argparse, logging, try/except, and a --dry-run flag. -->
