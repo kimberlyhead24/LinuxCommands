@@ -189,3 +189,49 @@ The `r` creates a raw string, which helps Python interpret Windows backslashes c
 - `with open(...) as file:` is usually safer because Python closes the file automatically.
 
 <!-- Improvement idea: Add examples for `readlines()`, iterating through a file line by line, explicit file modes such as `"r"` and `"w"`, and encodings such as `encoding="utf-8"` after those concepts appear in later lessons. -->
+
+## Text Mode and Binary Mode
+
+Python files are usually opened in text mode by default.
+
+```py
+with open("sample_data/declaration.txt", "rt") as textfile:
+    for line in textfile:
+        print(line)
+```
+
+### What `"rt"` Means
+
+| Mode character | Meaning |
+|---|---|
+| `"r"` | Open for reading |
+| `"t"` | Treat the file as text |
+
+`"rt"` is the same as the default read mode for a text file:
+
+```py
+open("sample_data/declaration.txt")
+open("sample_data/declaration.txt", "r")
+open("sample_data/declaration.txt", "rt")
+```
+
+All three open the file for reading text.
+
+## Binary Files
+
+Use binary mode for non-text data such as images, PDFs, audio, or ZIP files.
+
+```py
+with open("photo.jpg", "rb") as file:
+    image_data = file.read()
+```
+
+| Mode | Meaning |
+|---|---|
+| `"rb"` | Read binary data |
+| `"wb"` | Write binary data |
+| `"ab"` | Append binary data |
+
+Binary files are read and written as `bytes`, not normal text strings.
+
+> Do not use `encoding=` with binary mode.
