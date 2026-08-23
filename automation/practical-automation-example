@@ -1,0 +1,112 @@
+# Practical Automation Example
+
+## Core Idea
+
+A practical automation project starts with a repetitive task and turns its repeatable steps into a script.
+
+The goal is not to automate everything. The goal is to automate a clear, predictable process safely and consistently.
+
+## Automation Workflow
+
+1. Identify a repetitive task.
+2. Write down the manual steps.
+3. Decide what inputs the script needs.
+4. Define the expected output.
+5. Write a small version of the script.
+6. Test it on sample data.
+7. Review the results.
+8. Improve error handling and safety checks.
+9. Use the script on real data only after testing.
+
+## Example Task: Organize Downloaded Files
+
+### Manual Process
+
+1. Open the downloads folder.
+2. Look at each file.
+3. Identify its file type.
+4. Create folders for documents, images, and archives.
+5. Move each file into the matching folder.
+6. Repeat the process whenever the folder becomes cluttered.
+
+### Automation Goal
+
+Create a script that sorts files into folders based on their extensions.
+
+## Example Script
+
+```py
+from pathlib import Path
+import shutil
+
+downloads = Path("downloads")
+
+file_types = {
+    "documents": {".pdf", ".docx", ".txt"},
+    "images": {".jpg", ".jpeg", ".png", ".gif"},
+    "archives": {".zip", ".tar", ".gz"},
+}
+
+for category, extensions in file_types.items():
+    (downloads / category).mkdir(exist_ok=True)
+
+for file_path in downloads.iterdir():
+    if not file_path.is_file():
+        continue
+
+    for category, extensions in file_types.items():
+        if file_path.suffix.lower() in extensions:
+            destination = downloads / category / file_path.name
+            print(f"Would move: {file_path.name} -> {category}/")
+            # shutil.move(str(file_path), str(destination))
+            break
+```
+
+## What the Script Does
+
+| Code | Purpose |
+|---|---|
+| `Path("downloads")` | Represents the folder being organized |
+| `file_types` | Defines categories and the extensions that belong in each category |
+| `.mkdir(exist_ok=True)` | Creates category folders without failing if they already exist |
+| `.iterdir()` | Looks through items directly inside the downloads folder |
+| `.is_file()` | Skips folders and processes only files |
+| `.suffix.lower()` | Gets a file extension and standardizes its capitalization |
+| `print()` | Shows the planned action before making real changes |
+| `shutil.move()` | Moves a file to its destination folder |
+
+## Test Before Moving Files
+
+The `shutil.move()` line is commented out:
+
+```py
+# shutil.move(str(file_path), str(destination))
+```
+
+That makes the script a dry run. It prints planned changes without moving anything.
+
+After checking the output, remove the `#` only if the planned moves are correct:
+
+```py
+shutil.move(str(file_path), str(destination))
+```
+
+## Improvements for a Safer Script
+
+- Use a test folder rather than the real Downloads folder first.
+- Add a dry-run option.
+- Skip files that already exist at the destination.
+- Record moved files in a log.
+- Handle permission errors with `try` and `except`.
+- Ask the user before moving files in a live run.
+- Add more categories or let the user configure them.
+
+<!-- Improvement idea: Convert this example into a runnable project later with a command-line interface, a --dry-run option, logging, tests using temporary folders, and a README. -->
+
+## What to Remember
+
+- Start with a repetitive, predictable task.
+- Translate manual steps into clear script logic.
+- Test on copies or sample files first.
+- Use a dry run before allowing a script to change real files.
+- Build a small working script before adding more features.
