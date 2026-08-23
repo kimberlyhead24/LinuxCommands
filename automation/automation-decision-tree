@@ -1,0 +1,112 @@
+# Is Automation Worth the Time?
+
+## Core Idea
+
+Before automating a task, compare:
+
+- The one-time time cost to design, write, test, and maintain the automation
+- The repeated time cost of continuing to do the task manually
+
+Automation is worthwhile when the time saved from repeated manual work becomes greater than the time spent creating the automation.
+
+## Break-Even Formula
+
+```text
+time_to_automate < time_to_perform × number_of_times_done
+```
+
+Where:
+
+| Variable | Meaning |
+|---|---|
+| `time_to_automate` | Total one-time time needed to build, test, and deploy automation |
+| `time_to_perform` | Time required to complete the task once manually |
+| `number_of_times_done` | How many times the task will be repeated |
+
+Make sure all time values use the same unit, such as minutes.
+
+## Break-Even Point
+
+The break-even number of repetitions is:
+
+```text
+break_even_runs = time_to_automate / time_to_perform
+```
+
+After that many runs, the automation begins saving time.
+
+## Example
+
+A task takes 40 minutes each week.
+
+Creating the automation takes 10 hours.
+
+Convert 10 hours to minutes:
+
+```text
+10 × 60 = 600 minutes
+```
+
+Set up the comparison:
+
+```text
+600 < 40 × weeks
+```
+
+Divide both sides by 40:
+
+```text
+15 < weeks
+```
+
+The automation breaks even after 15 weekly runs.
+
+Beginning with the 16th week, the automated approach starts saving labor time.
+
+## Quick Decision Table
+
+| Situation | Likely decision |
+|---|---|
+| Task is rare and takes only a few minutes | Usually do it manually |
+| Task is repeated often and takes meaningful time | Consider automation |
+| Task has clear, predictable steps | Good automation candidate |
+| Task needs human judgment each time | Keep human review involved |
+| Automation could damage data or systems | Add testing, backups, and safeguards first |
+| Automation saves time after a reasonable break-even point | Usually worthwhile |
+
+## Time Is Not the Only Return
+
+Automation can also create soft ROI (return on investment).
+
+Soft ROI is harder to measure directly, but it can include:
+
+- Better team collaboration
+- Higher employee morale
+- More employee motivation
+- Greater job satisfaction
+- Less boredom from repetitive work
+- More time for problem-solving and higher-value tasks
+
+## Decision Checklist
+
+Before automating, ask:
+
+- How long does the task take each time?
+- How often does it happen?
+- How long will it take to build and test the automation?
+- How much maintenance will the automation need?
+- When will the work break even?
+- Does automation reduce errors or improve consistency?
+- Are there soft benefits, such as freeing people for more meaningful work?
+- Does the task require human approval or judgment?
+
+## What to Remember
+
+- Automation is an investment of time and effort.
+- Convert units before comparing times.
+- Find the break-even point to estimate when automation begins saving time.
+- Repetitive, predictable tasks are the strongest candidates.
+- Consider both measurable time savings and soft ROI.
+- Include maintenance and safety costs when estimating the real value of automation.
+
+<!-- Improvement idea: Add a small Python calculator later that accepts automation time, manual-task time, and frequency, then calculates the break-even point. -->
