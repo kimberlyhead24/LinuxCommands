@@ -146,14 +146,27 @@ with open("notes.txt", "r+") as file:
 
 `"r+"` allows both reading and writing, but it requires the file to already exist. For most beginner scripts, use separate read or write steps unless you specifically need both.
 
-## Use an Encoding
+## Encoding
 
-For text files, specify UTF-8 when you want predictable behavior across computers:
+Text files store characters using an encoding. If you do not specify one, Python uses a platform-dependent default encoding.
+
+For predictable behavior across computers, explicitly use UTF-8:
 
 ```py
 with open("notes.txt", "w", encoding="utf-8") as file:
     file.write("Hello, world!\n")
 ```
+
+UTF-8 is the modern standard encoding for most text files.
+
+Binary mode uses `bytes` instead of strings:
+
+```py
+with open("photo.jpg", "rb") as file:
+    image_data = file.read()
+```
+
+Do not use `encoding=` with binary modes such as `"rb"` or `"wb"`.
 
 ## Common Problems
 
@@ -191,6 +204,8 @@ Before writing a file:
 ## Course Source
 
 - [Coursera: Writing Files](https://www.coursera.org/learn/python-operating-system/lecture/fC3e9/writing-files)
+- - [Coursera: Study guide — Reading and writing files](https://www.coursera.org/learn/python-operating-system/supplement/INLPJ/study-guide-reading-and-writing-files)
+- [Python documentation: `open()`](https://docs.python.org/3/library/functions.html#open)
 
 - ## File Modes
 
