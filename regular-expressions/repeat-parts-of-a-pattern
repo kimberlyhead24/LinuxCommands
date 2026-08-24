@@ -59,3 +59,139 @@ assert is_us_phone_format("111-222-33333") is False
 ```
 
 This validates only the formatting shape; it does not confirm that a number is assigned, reachable, or appropriate for every country.
+
+
+## Counted Repetition: `{}`
+
+Use curly-brace quantifiers when the required number of repetitions matters.
+
+| Pattern | Meaning | Example |
+|---|---|---|
+| `{n}` | Exactly `n` occurrences | `\d{4}` |
+| `{m,n}` | From `m` through `n` occurrences | `\w{5,10}` |
+| `{m,}` | At least `m` occurrences | `\w{5,}` |
+| `{0,n}` | From zero through `n` occurrences | `\w{0,20}` |
+
+A counted quantifier applies only to the immediately preceding pattern.
+
+```py
+\d{4}        # Exactly four digits
+[A-Za-z]{5}  # Exactly five letters
+(ab){2,4}    # Repeat the group "ab" two through four times
+```
+
+## Exact-Length Matches Can Find Partial Words
+
+```py
+import re
+
+text = "a scary ghost appeared"
+
+print(re.findall(r"[A-Za-z]{5}", text))
+```
+
+Output:
+
+```py
+["scary", "ghost", "appea"]
+```
+
+`appea` appears because the pattern asks for any five consecutive letters. It does not require those five letters to form a complete word.
+
+## Match Complete Words with `\b`
+
+Use word boundaries when you mean a whole word, not a substring inside a longer word.
+
+```py
+import re
+
+text = "A scary ghost appeared"
+
+print(re.findall(r"\b[A-Za-z]{5}\b", text))
+```
+
+Output:
+
+```py
+["scary", "ghost"]
+```
+
+Pattern breakdown:
+
+| Piece | Meaning |
+|---|---|
+| `\b` | Word boundary |
+| `[A-Za-z]{5}` | Exactly five letters |
+| `\b` | Word boundary |
+
+`appeared` is excluded because it has more than five letters.
+
+## `search()` vs `findall()`
+
+```py
+import re
+
+text = "a scary ghost appeared"
+
+print(re.search(r"[A-Za-z]{5}", text))
+print(re.findall(r"[A-Za-z]{5}", text))
+```
+
+Use the function that matches your goal:
+
+| Goal | Function |
+|---|---|
+| Find whether at least one match exists | `re.search()` |
+| Extract the first match | `re.search()` plus `.group()` |
+| Extract all non-overlapping matches | `re.findall()` |
+| Iterate over all matches with positions | `re.finditer()` |
+
+## Best-Practice Examples
+
+### Validate exactly four digits
+
+```py
+import re
+
+def is_four_digit_pin(value: str) -> bool:
+    return re.fullmatch(r"\d{4}", value) is not None
+```
+
+```py
+assert is_four_digit_pin("4821") is True
+assert is_four_digit_pin("482") is False
+assert is_four_digit_pin("48210") is False
+assert is_four_digit_pin("48a1") is False
+```
+
+### Extract whole words with 5 to 10 word characters
+
+```py
+import re
+
+def medium_length_words(text: str) -> list[str]:
+    return re.findall(r"\b\w{5,10}\b", text)
+```
+
+```py
+medium_length_words("I really like strawberries")
+# ["really"]
+```
+
+`strawberries` is excluded because it is longer than 10 characters.
+
+### Find words beginning with `s`
+
+```py
+import re
+
+def words_starting_with_s(text: str) -> list[str]:
+    return re.findall(r"\bs\w{0,20}\b", text, re.IGNORECASE)
+```
+
+Use `{0,20}` instead of `{,20}`. Python accepts `{,20}`, but `{0,20}` is clearer and more portable across regex engines.
+
+## Decision Rule
+
+- Use `{n}` when the length is exact: PINs, fixed codes, date pieces.
+- Use `{m,n}` when a range is allowed: usernames, 
