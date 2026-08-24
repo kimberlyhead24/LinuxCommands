@@ -147,6 +147,48 @@ if __name__ == "__main__":
 ```
 
 This keeps the reusable logic cleaner than putting everything at the top level.
+## Python 2 vs Python 3 Input
+
+In Python 3, `input()` always returns a string.
+
+```py
+value = input("Enter something: ")
+print(value)
+print(type(value))
+```
+
+If the user types:
+
+```text
+123 + 1
+```
+
+the result is still a string:
+
+```text
+123 + 1
+<class 'str'>
+```
+
+In Python 2:
+
+- `raw_input()` returned a string
+- `input()` roughly behaved like `eval(raw_input(...))`
+
+In Python 3:
+
+- `raw_input()` does not exist
+- `input()` does **not** evaluate the user's text
+
+## `eval()` warning
+
+```py
+eval(user_text)
+```
+
+`eval()` executes a string as Python code.
+
+Do not use `eval()` on user input or untrusted text.
 
 ## What to remember
 
