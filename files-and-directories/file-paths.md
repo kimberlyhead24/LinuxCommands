@@ -159,3 +159,51 @@ The `/` operator joins paths when using `Path` objects. It does not mean divisio
 ## Course Source
 
 - [Coursera: File paths](https://www.coursera.org/learn/python-operating-system/lecture/pOcv7/file-paths)
+
+## Writing Windows Paths in Python
+
+### Windows path outside Python
+
+Windows commonly displays paths with backslashes:
+
+```text
+C:\my-directory\target-file.txt
+```
+
+### Recommended Python path
+
+Use forward slashes in Python code:
+
+```py
+path = "C:/my-directory/target-file.txt"
+```
+
+Python accepts forward slashes on Windows, and they avoid escape-sequence problems.
+
+### Escaped backslashes
+
+If you use Windows backslashes in a regular Python string, write each backslash twice:
+
+```py
+path = "C:\\my-directory\\target-file.txt"
+```
+
+A single backslash can start an escape sequence. For example:
+
+```py
+"\n"
+```
+
+means a newline, and `"\t"` means a tab.
+
+### Raw strings
+
+A raw string is another safe option:
+
+```py
+path = r"C:\my-directory\target-file.txt"
+```
+
+The `r` tells Python to treat backslashes as literal characters.
+
+> Avoid ending a raw string with one backslash, such as `r"C:\folder\"`, because the final backslash would escape the ending quote.
