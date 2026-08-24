@@ -181,4 +181,4 @@ If execution permission is actually needed, a safer choice is usually:
 chmod u+x script.py
 ```
 
-The lab’s main added value is connecting regex to a realistic file-automation workflow: find the legacy `abc.edu` domain, update it to `xyz.edu`, and save the changed CSV as a separate report. [page:74]
+
