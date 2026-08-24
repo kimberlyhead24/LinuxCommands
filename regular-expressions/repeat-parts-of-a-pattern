@@ -1,0 +1,61 @@
+## Exact Repetition: `{n}`
+
+Use `{n}` when a pattern must occur exactly `n` times.
+
+```py
+import re
+
+phone_pattern = r"\d{3}-\d{3}-\d{4}"
+
+print(re.fullmatch(phone_pattern, "111-222-3333"))
+```
+
+This validates a U.S.-style phone number in this exact shape:
+
+```text
+111-222-3333
+```
+
+Pattern breakdown:
+
+| Piece | Meaning |
+|---|---|
+| `\d{3}` | Exactly three digits |
+| `-` | A literal hyphen |
+| `\d{3}` | Exactly three digits |
+| `-` | A literal hyphen |
+| `\d{4}` | Exactly four digits |
+
+## Other Count Quantifiers
+
+| Pattern | Meaning |
+|---|---|
+| `{n}` | Exactly `n` occurrences |
+| `{m,n}` | From `m` through `n` occurrences |
+| `{m,}` | At least `m` occurrences |
+
+Examples:
+
+```py
+r"\d{4}"       # Exactly four digits
+r"\d{2,4}"     # Between two and four digits
+r"\d{8,}"      # Eight or more digits
+```
+
+## Practical Validator
+
+```py
+import re
+
+PHONE_PATTERN = re.compile(r"\d{3}-\d{3}-\d{4}")
+
+def is_us_phone_format(value: str) -> bool:
+    return PHONE_PATTERN.fullmatch(value) is not None
+
+assert is_us_phone_format("111-222-3333") is True
+assert is_us_phone_format("1112223333") is False
+assert is_us_phone_format("11-222-3333") is False
+assert is_us_phone_format("111-222-33333") is False
+```
+
+This validates only the formatting shape; it does not confirm that a number is assigned, reachable, or appropriate for every country.
