@@ -1,0 +1,235 @@
+# Text Pattern Basics
+
+## What this note covers
+
+Use these regex tools when you need to match text more flexibly than exact string matching.
+
+This note covers:
+
+- Wildcards with `.`
+- Character classes with `[]`
+- Character ranges such as `[a-z]`
+- Negated classes with `[^...]`
+- Alternatives with `|`
+- The difference between `re.search()` and `re.findall()`
+
+## 1. Wildcard: `.`
+
+A dot matches any single character except a newline.
+
+```py
+import re
+
+print(re.search(r"p.ng", "penguin"))
+print(re.search(r"p.ng", "ping"))
+print(re.search(r"p.ng", "pong"))
+```
+
+Use this when one character can vary but the rest of the pattern is fixed.
+
+### Better thinking
+
+Do not use `.` when the allowed character should be restricted.
+
+Bad:
+
+```py
+re.search(r"file.", text)
+```
+
+This matches too broadly.
+
+Better:
+
+```py
+re.search(r"file[0-9]", text)
+```
+
+This matches only a digit after `file`.
+
+## 2. Character classes: `[]`
+
+A character class matches exactly one character from the set inside the brackets.
+
+```py
+import re
+
+print(re.search(r"[Pp]ython", "Python"))
+print(re.search(r"[Pp]ython", "python"))
+```
+
+`[Pp]` means: match either uppercase `P` or lowercase `p`.
+
+Use this when only a small set of characters is valid.
+
+## 3. Character ranges
+
+A dash inside a character class can define a range.
+
+```py
+import re
+
+print(re.search(r"[a-z]way", "The end of the highway"))
+print(re.search(r"[a-z]way", "What a way to go"))
+```
+
+`[a-z]` means any lowercase letter.
+
+The first string matches because `hway` appears in `highway`. The second does not match because the character before `way` is a space, not a lowercase letter. [page:56]
+
+You can combine ranges:
+
+```py
+import re
+
+print(re.search(r"cloud[a-zA-Z0-9]", "cloudy"))
+print(re.search(r"cloud[a-zA-Z0-9]", "cloud9"))
+```
+
+This means: after `cloud`, match one letter or digit.
+
+## 4. Negated character classes: `[^...]`
+
+Inside square brackets, `^` means “match any character not listed here.”
+
+```py
+import re
+
+print(re.search(r"[^a-zA-Z]", "This is a sentence with spaces."))
+print(re.search(r"[^a-zA-Z ]", "This is a sentence with spaces."))
+```
+
+Pattern meanings:
+
+| Pattern | Meaning |
+|---|---|
+| `[^a-zA-Z]` | Match the first character that is not a letter |
+| `[^a-zA-Z ]` | Match the first character that is not a letter and not a space |
+
+In the first example, the match is the first space. In the second, the match is the period at the end. [page:56]
+
+## 5. Alternatives: `|`
+
+The pipe symbol means “match this or that.”
+
+```py
+import re
+
+print(re.search(r"cat|dog", "I like cats."))
+print(re.search(r"cat|dog", "I love dogs!"))
+print(re.search(r"cat|dog", "I like both dogs and cats."))
+```
+
+`re.search()` returns the first match it finds, not all possible matches. In `"I like both dogs and cats."`, it returns `dog`, because that appears first in the string. [page:56]
+
+## 6. Get all matches with `findall()`
+
+Use `re.findall()` when you need every match.
+
+```py
+import re
+
+text = "I like both dogs and cats."
+matches = re.findall(r"cat|dog", text)
+print(matches)
+```
+
+Output:
+
+```py
+['dog', 'cat']
+```
+
+The course transcript explicitly says `search()` returns only the first possible match, while `findall()` returns all possible matches. [page:56]
+
+## Best-practice versions
+
+### Case-insensitive words
+
+Instead of:
+
+```py
+re.search(r"[Pp]ython", text)
+```
+
+Prefer:
+
+```py
+re.search(r"python", text, re.IGNORECASE)
+```
+
+That is usually cleaner when the whole word should match regardless of case.
+
+### Reusable helper
+
+```py
+import re
+
+def contains_cat_or_dog(text: str) -> bool:
+    return re.search(r"cat|dog", text) is not None
+
+def all_cat_or_dog_matches(text: str) -> list[str]:
+    return re.findall(r"cat|dog", text)
+```
+
+### Restrict matches carefully
+
+Use the narrowest pattern that matches the real requirement.
+
+- Good: `[0-9]` for a digit
+- Better in Python regex: `\d`
+- Good: `[a-zA-Z]` for ASCII letters
+- Better only when appropriate: `[A-Za-z]` if you want the range explicit
+- Avoid `.` unless you truly mean any single character
+
+## LeetCode / interview mindset
+
+For fixed checks, simple string methods are often better:
+
+```py
+text.startswith("cat")
+"dog" in text
+text.endswith(".log")
+```
+
+Use regex when:
+
+- A character can vary
+- A match must follow a structure
+- You need one-of-many options
+- You need extraction or validation
+
+Examples:
+
+```py
+re.search(r"[aeiou]\w*", username)
+re.findall(r"cat|dog", sentence)
+re.search(r"[^a-zA-Z0-9]", password)
+```
+
+That is the useful distinction: regex is best when the pattern is structural, not just literal. The transcript also frames character classes as the way to make the wildcard stricter by limiting which characters are allowed. [page:56]
+
+## Naming rule to keep using
+
+A strong naming pattern for your repo would be:
+
+- `what-it-solves.md`
+- `syntax-you-need.md`
+- `common-patterns.md`
+- `pitfalls-and-better-ways.md`
+
+Examples:
+
+```text
+regular-expressions/
+├── README.md
+├── extract-patterns-from-text.md
+├── simple-matching-python.md
+├── text-pattern-basics.md
+├── repeat-matches-and-quantifiers.md
+├── capture-groups-and-extraction.md
+├── regex-vs-string-methods.md
+└── practice-patterns.md
+```
+
+That makes the repo much faster to scan than course-title naming, especially when you come back later just trying to remember syntax, tradeoffs, or when to use a feature.
