@@ -162,6 +162,8 @@ Checking the destination first helps avoid unintentionally replacing or conflict
 
 <!-- Improvement idea: Add `os.path.getsize()`, `os.path.getmtime()`, `os.path.isfile()`, and `os.path.isdir()` after the next lesson. Then add a pathlib comparison because `Path.unlink()`, `Path.rename()`, and `Path.exists()` are the more modern Python equivalents. -->
 
+<!-- Related note: See `os-vs-pathlib.md` for pathlib equivalents, file permissions with os.chmod(), binary-file handling, and try/except examples for file-system errors. -->
+
 ## Course Source
 
 - [Coursera: Working with Files](https://www.coursera.org/learn/python-operating-system/lecture/z5WQc/working-with-files)
