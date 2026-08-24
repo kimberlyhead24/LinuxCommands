@@ -284,3 +284,94 @@ if match:
 For straightforward patterns that scan an input of length \(n\), capture-based matching is generally \(O(n)\) time. Use specific character classes instead of overlapping broad patterns to avoid avoidable backtracking.
 
 <!-- Improvement idea: Add a follow-up note for `re.sub()` using backreferences, such as converting every valid `Last, First` name in a list or document. -->
+
+## Positive Lookahead: Require What Comes Next
+
+A positive lookahead checks that text is followed by another pattern **without including that next pattern in the match**.
+
+Syntax:
+
+```py
+(?=pattern)
+```
+
+Example: find test IDs only when they are followed by `-Passed`.
+
+```py
+import re
+
+text = "Test1-Passed, Test2-Passed, Test3-Failed, Test4-Passed, Test5-Failed"
+
+matches = re.findall(r"Test\d+(?=-Passed)", text)
+
+print(matches)
+```
+
+Output:
+
+```py
+["Test1", "Test2", "Test4"]
+```
+
+Pattern breakdown:
+
+| Piece | Meaning |
+|---|---|
+| `Test` | Literal text |
+| `\d+` | One or more digits |
+| `(?=-Passed)` | Require `-Passed` immediately after, but do not include it in the returned match |
+
+The course example uses the same idea: match test identifiers only when the following status is `Passed`. [page:72]
+
+## When to use it
+
+Use positive lookahead when the following text is a **condition**, not part of the value you want to return.
+
+```py
+import re
+
+text = "price=25USD price=30EUR"
+
+usd_prices = re.findall(r"\d+(?=USD)", text)
+print(usd_prices)
+```
+
+Output:
+
+```py
+["25"]
+```
+
+A simpler alternative is often better when you do not specifically need lookahead:
+
+```py
+re.findall(r"(\d+)USD", text)
+```
+
+That version captures the number before `USD`, and it is usually easier to read. Prefer lookahead when it makes the intent clearer or prevents you from consuming text you need to retain.
+
+## Corrected reference examples
+
+The study guide’s intended patterns, written correctly for Python, are:
+
+```py
+# One of several exact locations
+r"location is (London|Berlin|Madrid)"
+
+# Must begin with "My name is "
+r"^My name is (\w+)"
+
+# One uppercase letter
+r"[A-Z]"
+
+# Digit, dollar sign, hyphen, comma, or period
+r"[0-9$,\-.]"
+
+# U.S.-style phone-number shape
+r"\d{3}-\d{3}-\d{4}"
+
+# Turn initials into "Ms. Lastname"
+r"([A-Z])\.\s+(\w+)"
+```
+
+
