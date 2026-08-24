@@ -225,6 +225,252 @@ result = subprocess.run(
 logged_in_users = result.stdout.splitlines()
 ```
 
+## Advanced `subprocess.run()` Options
+
+`subprocess.run()` can control more than the command and its output.
+
+Useful options include:
+
+| Option | Purpose |
+|---|---|
+| `env=` | Give the child process a custom environment |
+| `cwd=` | Run the command from a chosen working directory |
+| `timeout=` | Stop a command that runs too long |
+| `shell=True` | Run the command through a shell; use sparingly |
+
+## Run a Command with a Modified Environment
+
+A child process inherits the parent process's environment by default.
+
+To change the environment for only one subprocess:
+
+1. Copy the current environment
+2. Modify the copy
+3. Pass the copy using `env=`
+
+```py
+import os
+import subprocess
+
+my_env = os.environ.copy()
+
+my_env["PATH"] = os.pathsep.join([
+    "/opt/myapp",
+    my_env.get("PATH", ""),
+])
+
+result = subprocess.run(
+    ["myapp"],
+    env=my_env,
+)
+```
+
+### What this does
+
+- `os.environ.copy()` makes a separate dictionary of the current environment variables.
+- `my_env` can be changed without modifying Python's own environment.
+- The code adds `/opt/myapp` at the beginning of `PATH`.
+- `env=my_env` gives that modified environment only to the `myapp` subprocess.
+
+`PATH` tells the operating system where to search for executable commands. Putting `/opt/myapp` first means an executable in that folder is found before an executable with the same name in a later directory.
+
+## Why `os.pathsep` Matters
+
+Do not hardcode `:` between `PATH` entries.
+
+```py
+os.pathsep
+```
+
+Returns:
+
+| System | Path separator |
+|---|---|
+| Linux/macOS | `:` |
+| Windows | `;` |
+
+```py
+os.pathsep.join(["/opt/myapp", old_path])
+```
+
+builds a valid `PATH` value for the current operating system.
+
+## Run in a Specific Directory
+
+Use `cwd=` to set the child process's current working directory.
+
+```py
+import subprocess
+
+result = subprocess.run(
+    ["git", "status"],
+    cwd="/path/to/project",
+    capture_output=True,
+    text=True,
+)
+```
+
+This runs `git status` as if you had first used:
+
+```bash
+cd /path/to/project
+git status
+```
+
+Your Python script's own working directory does not change.
+
+This is useful when the same command must run against several directories.
+
+```py
+from pathlib import Path
+import subprocess
+
+for project_dir in Path("/projects").iterdir():
+    if project_dir.is_dir():
+        subprocess.run(
+            ["git", "status", "--short"],
+            cwd=project_dir,
+        )
+```
+
+## Stop Commands That Hang
+
+Use `timeout=` to limit how long a command may run.
+
+```py
+import subprocess
+
+try:
+    result = subprocess.run(
+        ["ping", "-c", "1", "example.com"],
+        capture_output=True,
+        text=True,
+        timeout=10,
+        check=True,
+    )
+except subprocess.TimeoutExpired:
+    print("Command timed out")
+except subprocess.CalledProcessError as error:
+    print(error.stderr.strip())
+else:
+    print(result.stdout)
+```
+
+`timeout=10` means Python stops the command if it has not finished after 10 seconds.
+
+Use a timeout for commands that could hang because of:
+
+- Network failures
+- Unresponsive services
+- Locked resources
+- Unexpected external-tool behavior
+
+## `shell=True`
+
+Normally, pass the command and arguments as a list:
+
+```py
+subprocess.run(["echo", "hello"])
+```
+
+This does not use a shell.
+
+Use `shell=True` only when you specifically need shell features such as:
+
+- Variable expansion: `$HOME`
+- Globbing: `*.log`
+- Pipes: `|`
+- Redirection: `>`
+- Shell operators: `&&`, `||`
+
+```py
+subprocess.run(
+    "echo $HOME && ls *.log",
+    shell=True,
+)
+```
+
+Without `shell=True`, Python does not interpret `$HOME`, `*.log`, pipes, or redirection.
+
+## Security Rule
+
+Never combine `shell=True` with untrusted input.
+
+Unsafe:
+
+```py
+subprocess.run(
+    "ls " + user_input,
+    shell=True,
+)
+```
+
+A user could inject additional shell commands.
+
+Safe default:
+
+```py
+subprocess.run(["ls", user_input])
+```
+
+Use a list and keep `shell=False` unless a known, controlled command genuinely requires shell behavior.
+
+## Prefer Native Python for Long-Lived Automation
+
+System commands can be convenient, but they make scripts depend on:
+
+- A particular operating system
+- An installed external command
+- Command locations in `PATH`
+- Command-line flags staying the same
+- Command output format staying the same
+
+Prefer Python's standard library when possible:
+
+| Task | Prefer |
+|---|---|
+| Files and directories | `pathlib`, `shutil`, `os` |
+| CSV data | `csv` |
+| JSON data | `json` |
+| HTTP requests | A Python HTTP library |
+| Process execution | `subprocess` only when an external command is the right tool |
+
+Use `subprocess` for quick, well-defined tasks or when the command-line tool is specifically required. For complex or long-running automation, a native Python library is usually more portable, testable, and maintainable.
+
+## Safe Command Template
+
+```py
+import subprocess
+from collections.abc import Sequence
+from pathlib import Path
+
+def run_command(
+    command: Sequence[str],
+    *,
+    cwd: Path | None = None,
+    timeout: float = 30,
+) -> str:
+    result = subprocess.run(
+        command,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=timeout,
+    )
+    return result.stdout.strip()
+```
+
+```py
+try:
+    output = run_command(["git", "status", "--short"], cwd=Path("/path/to/project"))
+except subprocess.TimeoutExpired:
+    print("Command took too long")
+except subprocess.CalledProcessError as error:
+    print(error.stderr.strip())
+else:
+    print(output)
+```
 ## What to Remember
 
 - Add `capture_output=True` when Python needs command output.
