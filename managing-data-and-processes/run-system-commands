@@ -1,0 +1,280 @@
+# Run System Commands from Python
+
+## Core idea
+
+Python can run operating-system commands through the `subprocess` module.
+
+Use this when a command-line tool already does the job you need, or when the capability is not available through Python’s standard library.
+
+Examples:
+
+- Check whether a host responds with `ping`
+- Change file permissions with `chmod`
+- Copy files with `cp`
+- Run a system diagnostic command
+- Call an existing command-line tool from an automation script
+
+## Import the module
+
+```py
+import subprocess
+```
+
+## Run a command
+
+```py
+import subprocess
+
+subprocess.run(["date"])
+```
+
+This runs the system `date` command.
+
+`subprocess.run()` waits until the command finishes before the Python script continues.
+
+## Pass the command as a list
+
+```py
+subprocess.run(["sleep", "2"])
+```
+
+The first list item is the command. Every following item is a command-line argument.
+
+```text
+["sleep", "2"]
+  └───┬──┘  └─┬─┘
+   command  argument
+```
+
+This is equivalent to running in the shell:
+
+```bash
+sleep 2
+```
+
+## Parent and child processes
+
+When Python runs an external command:
+
+- Your Python script is the **parent process**
+- The external command is the **child process** or subprocess
+- `subprocess.run()` blocks the parent process
+- “Blocked” means the Python script waits and cannot continue until the child process finishes
+- After the command exits, control returns to the Python script
+
+Example:
+
+```py
+import subprocess
+
+print("Before")
+subprocess.run(["sleep", "2"])
+print("After")
+```
+
+Output behavior:
+
+```text
+Before
+# waits about two seconds
+After
+```
+
+## Get the result
+
+`subprocess.run()` returns a `CompletedProcess` object.
+
+```py
+import subprocess
+
+result = subprocess.run(["date"])
+
+print(result)
+print(result.returncode)
+```
+
+The returned object contains information about the executed command.
+
+The most important value in this lesson is:
+
+```py
+result.returncode
+```
+
+## Exit status
+
+| Return code | Meaning |
+|---:|---|
+| `0` | Command succeeded |
+| Non-zero | Command failed |
+
+Example of a successful command:
+
+```py
+import subprocess
+
+result = subprocess.run(["date"])
+
+print(result.returncode)
+```
+
+Expected result:
+
+```text
+0
+```
+
+## Handle a failed command
+
+```py
+import subprocess
+
+result = subprocess.run(["ls", "this_file_does_not_exist"])
+
+print(result.returncode)
+```
+
+`ls` prints an error because the file does not exist.
+
+The command exits with a non-zero return code.
+
+In the course example, the code is:
+
+```text
+2
+```
+
+Do not depend on a specific non-zero value unless the command’s documentation defines its meaning. The general rule is only:
+
+```py
+result.returncode != 0
+```
+
+means the command failed.
+
+## Check success or failure
+
+```py
+import subprocess
+
+result = subprocess.run(["ls", "example.txt"])
+
+if result.returncode == 0:
+    print("Command succeeded")
+else:
+    print(f"Command failed with exit code {result.returncode}")
+```
+
+## Better default: `check=True`
+
+For scripts where a failed command should stop the program, use:
+
+```py
+import subprocess
+
+subprocess.run(["ls", "example.txt"], check=True)
+```
+
+With `check=True`, Python raises `subprocess.CalledProcessError` when the command exits with a non-zero status.
+
+```py
+import subprocess
+
+try:
+    subprocess.run(["ls", "missing.txt"], check=True)
+except subprocess.CalledProcessError as error:
+    print(f"Command failed: {error.returncode}")
+```
+
+Use this when failure should not be ignored.
+
+## Output behavior
+
+By default, command output goes directly to the terminal.
+
+```py
+subprocess.run(["date"])
+```
+
+This means Python runs the command, but does not keep the output for later processing.
+
+This is good when:
+
+- The command does not produce useful output
+- You only care whether it succeeded
+- You want the user to see the command output directly
+
+Examples:
+
+```py
+subprocess.run(["sleep", "2"])
+subprocess.run(["chmod", "u+x", "script.py"])
+subprocess.run(["cp", "source.txt", "backup.txt"])
+```
+
+## When not to use `subprocess`
+
+Prefer a Python library when one cleanly performs the job.
+
+| Task | Prefer |
+|---|---|
+| Read or write files | `pathlib` or `open()` |
+| Copy, move, or remove files | `shutil` |
+| Inspect paths and directories | `pathlib` or `os` |
+| Parse CSV | `csv` |
+| Match text patterns | `re` |
+| Run an existing system command | `subprocess` |
+
+Use `subprocess` when the system command is genuinely the best tool, not just because a shell command exists.
+
+## Security rule: do not use `shell=True`
+
+Avoid this:
+
+```py
+subprocess.run("ls " + user_input, shell=True)
+```
+
+It can let user-controlled text be interpreted as shell code.
+
+Prefer a list:
+
+```py
+subprocess.run(["ls", user_input])
+```
+
+Passing a list keeps the command and its arguments separate.
+
+## Practical script structure
+
+```py
+#!/usr/bin/env python3
+
+import subprocess
+import sys
+
+def main() -> int:
+    result = subprocess.run(["date"])
+
+    if result.returncode != 0:
+        print(f"date failed with exit code {result.returncode}")
+        return result.returncode
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+## What to remember
+
+- Import `subprocess` to run external commands.
+- Use `subprocess.run([...])`.
+- Pass command arguments as a list.
+- `run()` waits for the command to finish.
+- The Python script is the parent process; the command is a child process.
+- `result.returncode == 0` means success.
+- A non-zero return code means failure.
+- Default command output goes to the terminal.
+- Use `check=True` when failure should raise an exception.
+- Avoid `shell=True`, especially with user input.
