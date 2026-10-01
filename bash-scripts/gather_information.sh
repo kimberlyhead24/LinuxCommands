@@ -4,7 +4,7 @@
 ### ps - print current running processes
 uptime - how long the computer has been running
 free - tells how much memory is free ###
-line="-----------------------------"
+line="-----------------------------------------------------------------------"
 echo "Starting at: ${date}"; echo $line
 
 echo "UPTIME"; uptime; echo $line
